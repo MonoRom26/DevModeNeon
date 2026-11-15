@@ -1,22 +1,19 @@
 name: DevModeNeon
-
 options:
+  bundleIdPrefix: com.neonx
   deploymentTarget:
-    iOS: "14.0"
-
+    iOS: "15.0"
 targets:
   DevModeNeon:
     type: application
     platform: iOS
     sources:
-      - path: DevModeNeon
+      - DevModeNeon
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.devmodeneon.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.neonx.devmode
         PRODUCT_NAME: DevModeNeon
-        SWIFT_VERSION: "5.0"
+        SWIFT_VERSION: 5.0
         TARGETED_DEVICE_FAMILY: "1,2"
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: DevMode Neon
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        CODE_SIGNING_ALLOWED: NO
+        INFOPLIST_KEY_CFBundleDisplayName: "DevMode Neon"
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.utilities"
