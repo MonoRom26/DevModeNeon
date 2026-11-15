@@ -2,7 +2,7 @@ name: DevModeNeon
 
 options:
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "14.0"
 
 targets:
   DevModeNeon:
