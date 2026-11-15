@@ -1,69 +1,35 @@
-name: Build DevMode Neon IPA
-
+name: Build DevMode Neon
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-
-permissions:
-  contents: read
+    branches: [ main, master ]
 
 jobs:
   build:
-    runs-on: macos-15
-
+    runs-on: macos-latest
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Show Xcode version
-        run: |
-          xcode-select -p
-          xcodebuild -version
-
+      - uses: actions/checkout@v4
       - name: Install XcodeGen
         run: brew install xcodegen
-
       - name: Generate Xcode project
         run: xcodegen generate
-
-      - name: Build unsigned iOS app
+      - name: Build unsigned app
         run: |
-          set -o pipefail
-          xcodebuild \
-            -project DevModeNeon.xcodeproj \
+          xcodebuild -project DevModeNeon.xcodeproj \
             -scheme DevModeNeon \
-            -configuration Release \
             -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath build \
+            -configuration Release \
             CODE_SIGNING_ALLOWED=NO \
-            build 2>&1 | tee build.log
-
-      - name: Package unsigned IPA
+            PRODUCT_BUNDLE_IDENTIFIER=com.neonx.devmode \
+            build
+      - name: Package app payload
         run: |
-          APP_PATH="build/Build/Products/Release-iphoneos/DevModeNeon.app"
-          test -d "$APP_PATH"
-          rm -rf Payload DevModeNeon.ipa
-          mkdir Payload
+          mkdir -p Payload
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -path '*/Build/Products/Release-iphoneos/DevModeNeon.app' -print -quit)
+          test -n "$APP_PATH"
           cp -R "$APP_PATH" Payload/
-          /usr/bin/zip -qry DevModeNeon.ipa Payload
-          test -s DevModeNeon.ipa
-
-      - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+          zip -r DevModeNeon-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
         with:
-          name: DevModeNeon-IPA
-          path: DevModeNeon.ipa
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload build log if build fails
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: DevModeNeon-build-log
-          path: build.log
-          if-no-files-found: ignore
-          retention-days: 7
+          name: DevModeNeon-unsigned-IPA
+          path: DevModeNeon-unsigned.ipa
