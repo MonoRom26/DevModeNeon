@@ -1,0 +1,22 @@
+name: DevModeNeon
+
+options:
+  deploymentTarget:
+    iOS: "16.0"
+
+targets:
+  DevModeNeon:
+    type: application
+    platform: iOS
+    sources:
+      - path: DevModeNeon
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devmodeneon.app
+        PRODUCT_NAME: DevModeNeon
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: DevMode Neon
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        CODE_SIGNING_ALLOWED: NO
