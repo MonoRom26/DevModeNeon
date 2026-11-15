@@ -2,7 +2,7 @@ name: DevModeNeon
 options:
   bundleIdPrefix: com.neonx
   deploymentTarget:
-    iOS: "15.0"
+    iOS: "16.0"
 targets:
   DevModeNeon:
     type: application
