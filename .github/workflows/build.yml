@@ -1,0 +1,69 @@
+name: Build DevMode Neon IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: |
+          xcode-select -p
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build unsigned iOS app
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project DevModeNeon.xcodeproj \
+            -scheme DevModeNeon \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee build.log
+
+      - name: Package unsigned IPA
+        run: |
+          APP_PATH="build/Build/Products/Release-iphoneos/DevModeNeon.app"
+          test -d "$APP_PATH"
+          rm -rf Payload DevModeNeon.ipa
+          mkdir Payload
+          cp -R "$APP_PATH" Payload/
+          /usr/bin/zip -qry DevModeNeon.ipa Payload
+          test -s DevModeNeon.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevModeNeon-IPA
+          path: DevModeNeon.ipa
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload build log if build fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: DevModeNeon-build-log
+          path: build.log
+          if-no-files-found: ignore
+          retention-days: 7
